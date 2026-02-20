@@ -13,11 +13,12 @@ function getTareas() {
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, "[]");
 
   const data = fs.readFileSync(filePath, "utf-8");
-
+// Devolver las tareas aunque el JSON esté corrupto
   try {
     return JSON.parse(data);
   } catch {
     console.error("tareas.json está corrupto. Reiniciando...");
+    fs.writeFileSync(filePath, "[]"); // repara el archivo
     return [];
   }
 }
@@ -45,7 +46,7 @@ yargs.command({
   },
 
   handler(argv) {
-    if (!argv.titulo.trim()) {
+    if (!argv.titulo || !argv.titulo.trim()) {  // blindamos para que no se rompa con undefined, .trim
       console.error("El título no puede estar vacío.");
       return;
     }
